@@ -21,9 +21,18 @@ logs <- data.frame(read.csv("C:/Users/jpelt/Desktop/Datafest/SienaDataFest2022_T
   summarise(exit_count = length(player_id))
 ```
 
+```{r}
+  playtime_data <- logs %>%
+  filter(!is.na(avatar_age)) %>%
+  select(player_id, avatar_age) %>%
+  group_by(player_id) %>%
+  summarise(age = max(avatar_age))
+  mean(playtime_data$age)
+```
+
 ``` {r include=FALSE}
 hist(
-  playtime_data$exit_count,
-  breaks = 25
+  playtime_data$age,
+  breaks = 3
   )
 ```
