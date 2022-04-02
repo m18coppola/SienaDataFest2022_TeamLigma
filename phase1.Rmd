@@ -8,14 +8,26 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
-logs <- read_csv("data/logs.csv", 
-    col_types = cols(row_id = col_integer(), 
-        player_id = col_integer(), school = col_integer(), 
-        date = col_date(format = "%Y-%m-%d"),
-        event_id = col_integer(), event_time_dbl = col_integer(), 
-        stack_id = col_integer(), pan_scene_start_left = col_integer(), 
-        pan_scene_end_left = col_integer(), 
-        sense_id = col_integer(), avatar_age = col_integer()))
+logs <- read_csv("data/logs.csv", col_types = cols(row_id = col_integer(), 
+    player_id = col_integer(), school = col_integer(), 
+    date = col_date(format = "%Y-%m-%d"), 
+    event_id = col_integer(), event_time = col_skip(), 
+    event_time_dbl = col_number(), stack_id = col_integer(), 
+    data_headers = col_skip(), data_values = col_skip(), 
+    skill_level_know = col_number(), skill_level_priority = col_number(), 
+    skill_level_people = col_number(), skill_level_refusal = col_number(), 
+    skill_level_me = col_number(), minigame_id = col_number(), 
+    minigame_level = col_number(), skill_id = col_character(), 
+    old_skill_point = col_number(), new_skill_point = col_number(), 
+    pan_scene_start_left = col_number(), 
+    pan_scene_end_left = col_number(), scan_start_point = col_skip(), 
+    scan_end_point = col_skip(), sense_id = col_integer(), 
+    animatic_id = col_character(), animatic_time_elapsed = col_skip(), 
+    animatic_time_left = col_skip(), avatar_age = col_number(), 
+    aa_level_id = col_integer(), chunk_id = col_integer(), 
+    piece_id = col_integer(), old_choice_id = col_integer(), 
+    old_label = col_character(), choice_id = col_integer(), 
+    new_choice_id = col_integer()))
 
 S5_scores_cleaned <- read_csv("data/S5_scores_cleaned.csv")
 ```
