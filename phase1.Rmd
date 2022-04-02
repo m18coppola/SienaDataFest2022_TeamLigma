@@ -1,6 +1,6 @@
 ---
 title: "Datafest_2022"
-author: "Jacob Pelton"
+author: "Jacob Pelton, Michael Coppola, Edward Wilhelm, Jordan Epp"
 date: "4/2/2022"
 output: html_document
 ---
@@ -8,14 +8,16 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
-logs <- read_csv("C:/Users/jpelt/Downloads/logs.csv", 
+logs <- read_csv("data/logs.csv", 
     col_types = cols(row_id = col_integer(), 
         player_id = col_integer(), school = col_integer(), 
-        date = col_date(format = "%Y-%m-%d"), 
+        date = col_date(format = "%Y-%m-%d"),
         event_id = col_integer(), event_time_dbl = col_integer(), 
         stack_id = col_integer(), pan_scene_start_left = col_integer(), 
         pan_scene_end_left = col_integer(), 
         sense_id = col_integer(), avatar_age = col_integer()))
+
+S5_scores_cleaned <- read_csv("data/S5_scores_cleaned.csv")
 ```
 
 
