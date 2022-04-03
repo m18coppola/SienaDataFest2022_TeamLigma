@@ -9,30 +9,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 
-logs <- data.frame(read.csv("C:/Users/jpelt/Desktop/Datafest/SienaDataFest2022_TeamLigma/data/logs.csv", header=TRUE))
-```
+# load data
+logs <- data.frame(read.csv("data/logs.csv", header=TRUE))
 
-```{r}
-  playtime_data <- logs %>%
-  mutate(event_time_dbl <- as.numeric(event_time_dbl)) %>%
-  filter(stack_id == 0) %>%
-  filter(event_id == 204) %>%
+# transform into player dataset
+players <- logs %>%
   group_by(player_id) %>%
-  summarise(exit_count = length(player_id))
-```
-
-```{r}
-  playtime_data <- logs %>%
-  filter(!is.na(avatar_age)) %>%
-  select(player_id, avatar_age) %>%
-  group_by(player_id) %>%
-  summarise(age = max(avatar_age))
-  mean(playtime_data$age)
+  mutate(totalPlaytime = max(event_time_dbl)) %>%
+  mutate(gender = max(avatar_gender, na.rm = TRUE)) %>%
+  mutate(race = max(avatar_id, na.rm = TRUE)) %>%
+  mutate(age = max(avatar_age, na.rm = TRUE)) %>%
+  select(player_id, totalPlaytime, gender, race, age) %>%
+  distinct()
 ```
 
 ``` {r include=FALSE}
-hist(
-  playtime_data$age,
-  breaks = 3
+boxplot(
+  players$totalPlaytime~players$race
   )
 ```
