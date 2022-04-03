@@ -2,29 +2,159 @@
 title: "Datafest_2022"
 author: "Jacob Pelton, Michael Coppola, Edward Wilhelm, Jordan Epp"
 date: "4/2/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
+library(readr)
+# library(lubridate)
+
+s5.raw <- read_csv("S5_scores_cleaned_transposed.csv", 
+    col_types = cols(player_id = col_integer()))
 
 # load data
 logs <- data.frame(read.csv("data/logs.csv", header=TRUE))
 
+
+```
+
+```{r}
 # transform into player dataset
 players <- logs %>%
   group_by(player_id) %>%
-  mutate(totalPlaytime = max(event_time_dbl)) %>%
-  mutate(gender = max(avatar_gender, na.rm = TRUE)) %>%
-  mutate(race = max(avatar_id, na.rm = TRUE)) %>%
-  mutate(age = max(avatar_age, na.rm = TRUE)) %>%
-  select(player_id, totalPlaytime, gender, race, age) %>%
+  mutate(
+    total_playtime = max(event_time_dbl),
+    gender = max(avatar_gender, na.rm = TRUE),
+    race = max(avatar_id, na.rm = TRUE),
+    age = max(avatar_age, na.rm = TRUE),
+    event_freq = length(player_id)/total_playtime,
+    event_count = n(),
+    total_skill_points = sum(if_else(event_id == 1005, 1, 0, 0))) %>%
+  select(
+    player_id,
+    total_playtime,
+    gender,
+    race,
+    age,
+    event_freq,
+    event_count,
+    total_skill_points) %>%
   distinct()
 ```
 
-``` {r include=FALSE}
+# Analysis of Total Playtime per Player
+``` {r}
 boxplot(
-  players$totalPlaytime~players$race
-  )
+  main = "Distibution of Total in-game Time",
+  players$total_playtime,
+  horizontal = TRUE,
+  xlab = "Seconds played"
+)
+plot(
+  main = "Density of Total in-game Time",
+  density(players$total_playtime)
+)
+polygon(
+  density(players$total_playtime),
+  col = rgb(1.0,0.0,0.0,0.5)
+)
+```
+
+# Analysis of Event Count
+``` {r}
+boxplot(
+  main = "Distibution of Event Count per Player",
+  players$event_count,
+  horizontal = TRUE,
+  xlab = "Number of Events"
+)
+plot(
+  main = "Density of Event Count per Player",
+  density(players$event_count)
+)
+polygon(
+  density(players$event_count),
+  col = rgb(1.0,0.0,0.0,0.5)
+)
+```
+
+# Relating Events with Time
+```{r}
+boxplot(
+  main = "Distibution of Event Frequencies",
+  players$event_freq,
+  horizontal = TRUE,
+  xlab = "Events per Second"
+)
+plot(
+  main = "Density of Event Frequencies",
+  density(players$event_freq)
+)
+polygon(
+  density(players$event_freq),
+  col = rgb(1.0,0.0,0.0,0.5)
+)
+```
+
+# Identifying who went wrong
+```{r}
+players.active <- players %>%
+  filter(event_freq > 0.1)
+boxplot(
+  main = "Distibution of Total in-game Time (Active Players)",
+  players.active$total_playtime,
+  horizontal = TRUE,
+  xlab = "Seconds played"
+)
+plot(
+  main = "Density of Total in-game Time (Active Players)",
+  density(players.active$total_playtime)
+)
+polygon(
+  density(players.active$total_playtime),
+  col = rgb(1.0,0.0,0.0,0.5)
+)
+```
+
+```{r}
+players.inactive <- players %>%
+  filter(event_freq <= 0.1)
+boxplot(
+  main = "Distibution of Total in-game Time (Inactive Players)",
+  players.inactive$total_playtime,
+  horizontal = TRUE,
+  xlab = "Seconds played"
+)
+plot(
+  main = "Density of Total in-game Time (Inactive Players)",
+  density(players.inactive$total_playtime)
+)
+polygon(
+  density(players.inactive$total_playtime),
+  col = rgb(1.0,0.0,0.0,0.5)
+)
+```
+
+# Analysis of inactive players
+```{r}
+plot(density(players.inactive$total_playtime))
+for(id in sample(players.inactive$player_id, 10)){
+  inactive_player <- logs %>%
+    filter(player_id == id)
+  hist(inactive_player$event_time_dbl, main = paste("Histogram of Event Timestamps for inactive player ", id))
+}
+```
+
+# Active Players
+```{r}
+plot(density(players.active$total_playtime))
+for(id in sample(players.active$player_id, 10)){
+  active_player <- logs %>%
+    filter(player_id == id)
+  hist(active_player$event_time_dbl, main = paste("Histogram of Event Timestamps for active player ", id))
+}
 ```
